@@ -182,9 +182,7 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "right", "l":
 		m.adjustFieldChoice(1)
 	case "a":
-		m.applyThresholds()
-	case "s":
-		m.saveAndPersist()
+		m.applyAndSave()
 	case "r":
 		m.refreshAll()
 		m.setMessage("Refreshed", successStyle)
@@ -315,7 +313,7 @@ func (m *model) adjustValue(delta int) {
 	}
 }
 
-func (m *model) applyThresholds() {
+func (m *model) applyAndSave() {
 	if len(m.batteries) == 0 {
 		return
 	}
@@ -334,34 +332,16 @@ func (m *model) applyThresholds() {
 		}
 	}
 
-	m.refreshBatInfo()
-	m.setMessage(fmt.Sprintf("Applied: start=%d%% stop=%d%%", m.startVal, m.stopVal), successStyle)
-}
-
-func (m *model) saveAndPersist() {
-	cfg := persist.Config{
-		Battery: m.batteries[0],
-		Start:   m.startVal,
-		Stop:    m.stopVal,
-	}
-
+	cfg := persist.Config{Battery: bat, Start: m.startVal, Stop: m.stopVal}
 	if err := persist.SaveConfig(cfg); err != nil {
-		m.setMessage(fmt.Sprintf("Save error: %v (try with sudo)", err), errorStyle)
+		m.refreshBatInfo()
+		m.setMessage(fmt.Sprintf("Applied %d/%d (config save failed: %v)", m.startVal, m.stopVal, err), errorStyle)
 		return
 	}
 
-	if err := persist.InstallService(); err != nil {
-		m.setMessage(fmt.Sprintf("Service error: %v (try with sudo)", err), errorStyle)
-		return
-	}
-
-	if err := persist.InstallUdevRule(); err != nil {
-		m.setMessage(fmt.Sprintf("Udev error: %v", err), errorStyle)
-		return
-	}
-
+	m.refreshBatInfo()
 	m.refreshPersistStatus()
-	m.setMessage(fmt.Sprintf("Saved & persistence enabled: %d%%–%d%%", m.startVal, m.stopVal), successStyle)
+	m.setMessage(fmt.Sprintf("Applied & saved: %d%%–%d%%", m.startVal, m.stopVal), successStyle)
 }
 
 func (m *model) togglePersist() {
@@ -377,7 +357,16 @@ func (m *model) togglePersist() {
 		m.refreshPersistStatus()
 		m.setMessage("Persistence disabled", dimStyle)
 	} else {
-		m.saveAndPersist()
+		if err := persist.InstallService(); err != nil {
+			m.setMessage(fmt.Sprintf("Error: %v (try with sudo)", err), errorStyle)
+			return
+		}
+		if err := persist.InstallUdevRule(); err != nil {
+			m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
+			return
+		}
+		m.refreshPersistStatus()
+		m.setMessage("Persistence enabled (systemd + udev)", successStyle)
 	}
 }
 

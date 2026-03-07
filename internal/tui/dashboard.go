@@ -222,8 +222,7 @@ func renderHelpBar(m model) string {
 		{"↑↓", "navigate"},
 		{"←→", "adjust"},
 		{"enter", "select/edit"},
-		{"a", "apply"},
-		{"s", "save"},
+		{"a", "apply & save"},
 		{"r", "refresh"},
 		{"q", "quit"},
 	}
