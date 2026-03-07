@@ -27,7 +27,6 @@ type model struct {
 	backend       backend.Backend
 	batteries     []string
 	activeField   field
-	editMode      bool
 	startVal      int
 	stopVal       int
 	behaviourIdx  int
@@ -142,45 +141,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	key := msg.String()
 
-	if key == "q" || key == "ctrl+c" {
-		return m, tea.Quit
-	}
-
-	if key == "esc" {
-		if m.editMode {
-			m.editMode = false
-			m.refreshThresholds()
-		}
-		return m, nil
-	}
-
-	if key == "enter" {
-		return m.handleEnter()
-	}
-
-	if m.editMode {
-		switch key {
-		case "left", "h":
-			m.adjustValue(-1)
-		case "right", "l":
-			m.adjustValue(1)
-		case "H":
-			m.adjustValue(-5)
-		case "L":
-			m.adjustValue(5)
-		}
-		return m, nil
-	}
-
 	switch key {
+	case "q", "ctrl+c":
+		return m, tea.Quit
+
 	case "up", "k":
 		m.prevField()
 	case "down", "j":
 		m.nextField()
+
 	case "left", "h":
-		m.adjustFieldChoice(-1)
+		m.adjustCurrent(-1)
 	case "right", "l":
-		m.adjustFieldChoice(1)
+		m.adjustCurrent(1)
+	case "H":
+		m.adjustCurrent(-5)
+	case "L":
+		m.adjustCurrent(5)
+
+	case "enter":
+		m.handleEnter()
+
 	case "a":
 		m.applyAndSave()
 	case "r":
@@ -191,13 +172,8 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) handleEnter() (tea.Model, tea.Cmd) {
+func (m *model) handleEnter() {
 	switch m.activeField {
-	case fieldStart, fieldStop, fieldBehaviour:
-		m.editMode = !m.editMode
-		if m.editMode {
-			m.message = ""
-		}
 	case fieldPreset:
 		p := preset.Presets[m.presetIdx]
 		start, stop, err := preset.AdaptToBackend(p, m.backend)
@@ -211,11 +187,12 @@ func (m model) handleEnter() (tea.Model, tea.Cmd) {
 	case fieldPersist:
 		m.togglePersist()
 	}
-	return m, nil
 }
 
-func (m *model) adjustFieldChoice(delta int) {
+func (m *model) adjustCurrent(delta int) {
 	switch m.activeField {
+	case fieldStart, fieldStop, fieldBehaviour:
+		m.adjustValue(delta)
 	case fieldPreset:
 		m.presetIdx += delta
 		if m.presetIdx < 0 {
@@ -224,8 +201,6 @@ func (m *model) adjustFieldChoice(delta int) {
 		if m.presetIdx >= len(preset.Presets) {
 			m.presetIdx = 0
 		}
-	case fieldStart, fieldStop, fieldBehaviour:
-		m.adjustValue(delta)
 	}
 }
 

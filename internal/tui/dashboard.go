@@ -43,15 +43,13 @@ func renderDashboard(m model) string {
 
 	// Thresholds
 	b.WriteString("  " + labelStyle.Render("Charge Thresholds") + "\n")
-	b.WriteString(renderThresholdLine("Start", m.startVal,
-		m.activeField == fieldStart && m.editMode, m.activeField == fieldStart) + "\n")
-	b.WriteString(renderThresholdLine("Stop", m.stopVal,
-		m.activeField == fieldStop && m.editMode, m.activeField == fieldStop) + "\n")
+	b.WriteString(renderThresholdLine("Start", m.startVal, m.activeField == fieldStart) + "\n")
+	b.WriteString(renderThresholdLine("Stop", m.stopVal, m.activeField == fieldStop) + "\n")
 
 	caps := m.backend.Capabilities()
 	if caps.ChargeBehaviour && len(m.behaviourOpts) > 0 {
 		b.WriteString(renderBehaviour(m.behaviourCur, m.behaviourOpts,
-			m.activeField == fieldBehaviour, m.editMode) + "\n")
+			m.activeField == fieldBehaviour) + "\n")
 	}
 
 	b.WriteString("\n")
@@ -105,7 +103,7 @@ func renderStatus(status string) string {
 	}
 }
 
-func renderThresholdLine(label string, value int, editing bool, focused bool) string {
+func renderThresholdLine(label string, value int, focused bool) string {
 	const barWidth = 30
 	pos := value * barWidth / 100
 	if pos >= barWidth {
@@ -115,7 +113,7 @@ func renderThresholdLine(label string, value int, editing bool, focused bool) st
 	var bar strings.Builder
 	for i := 0; i < barWidth; i++ {
 		if i == pos {
-			if editing {
+			if focused {
 				bar.WriteString(selectedStyle.Render("●"))
 			} else {
 				bar.WriteString(accentStyle.Render("●"))
@@ -131,18 +129,18 @@ func renderThresholdLine(label string, value int, editing bool, focused bool) st
 	}
 
 	valStr := fmt.Sprintf("%d%%", value)
-	if editing {
+	if focused {
 		valStr = selectedStyle.Render(valStr)
 	}
 
 	return fmt.Sprintf("%s%-6s ◄%s► %s", prefix, label+":", bar.String(), valStr)
 }
 
-func renderBehaviour(current string, available []string, focused bool, editing bool) string {
+func renderBehaviour(current string, available []string, focused bool) string {
 	var parts []string
 	for _, mode := range available {
 		if mode == current {
-			if editing && focused {
+			if focused {
 				parts = append(parts, selectedStyle.Render("["+mode+"]"))
 			} else {
 				parts = append(parts, accentStyle.Render("["+mode+"]"))
