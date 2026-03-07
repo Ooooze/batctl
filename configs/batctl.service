@@ -1,0 +1,11 @@
+[Unit]
+Description=Apply battery charge thresholds (batctl)
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/batctl apply
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

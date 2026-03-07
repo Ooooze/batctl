@@ -1,0 +1,2 @@
+# Restore battery charge thresholds after resume from suspend
+ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Battery", RUN+="/usr/bin/batctl apply"
