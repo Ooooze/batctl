@@ -7,11 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/spaceclam/batctl/internal/backend"
-	"github.com/spaceclam/batctl/internal/battery"
-	"github.com/spaceclam/batctl/internal/persist"
-	"github.com/spaceclam/batctl/internal/preset"
-	"github.com/spaceclam/batctl/internal/tui"
+	"github.com/Ooooze/batctl/internal/backend"
+	"github.com/Ooooze/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/persist"
+	"github.com/Ooooze/batctl/internal/preset"
+	"github.com/Ooooze/batctl/internal/tui"
 )
 
 func main() {

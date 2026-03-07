@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/preset"
+	"github.com/Ooooze/batctl/internal/preset"
 )
 
 func renderDashboard(m model) string {

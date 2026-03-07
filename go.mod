@@ -1,4 +1,4 @@
-module github.com/spaceclam/batctl
+module github.com/Ooooze/batctl
 
 go 1.24.13
 

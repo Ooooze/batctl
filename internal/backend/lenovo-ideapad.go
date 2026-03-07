@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/battery"
 )
 
 type LenovoIdeaPadBackend struct {

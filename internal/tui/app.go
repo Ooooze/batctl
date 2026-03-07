@@ -7,10 +7,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/spaceclam/batctl/internal/backend"
-	"github.com/spaceclam/batctl/internal/battery"
-	"github.com/spaceclam/batctl/internal/persist"
-	"github.com/spaceclam/batctl/internal/preset"
+	"github.com/Ooooze/batctl/internal/backend"
+	"github.com/Ooooze/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/persist"
+	"github.com/Ooooze/batctl/internal/preset"
 )
 
 type field int

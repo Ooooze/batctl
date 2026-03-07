@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/battery"
 )
 
 type DellBackend struct{}

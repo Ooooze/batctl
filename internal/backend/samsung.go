@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/battery"
 )
 
 const samsungBatteryLifeExtenderPath = "/sys/devices/platform/samsung/battery_life_extender"

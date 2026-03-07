@@ -58,19 +58,19 @@ Tools like TLP are powerful but heavy and config-file-driven.
 ### Quick install (any distro)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/spaceclam/batctl/master/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Ooooze/batctl/master/install.sh | sudo bash
 ```
 
 To uninstall:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/spaceclam/batctl/master/install.sh | sudo bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/Ooooze/batctl/master/install.sh | sudo bash -s -- --uninstall
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/spaceclam/batctl.git
+git clone https://github.com/Ooooze/batctl.git
 cd batctl
 make
 sudo make install
@@ -90,7 +90,7 @@ makepkg -si
 
 ### Pre-built binary
 
-Download from [Releases](https://github.com/spaceclam/batctl/releases), then:
+Download from [Releases](https://github.com/Ooooze/batctl/releases), then:
 
 ```bash
 chmod +x batctl

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/battery"
 )
 
 const huaweiThresholdsPath = "/sys/devices/platform/huawei-wmi/charge_control_thresholds"

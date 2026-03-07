@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="spaceclam/batctl"
+REPO="Ooooze/batctl"
 BINARY="batctl"
 INSTALL_DIR="/usr/bin"
 SYSTEMD_DIR="/etc/systemd/system"

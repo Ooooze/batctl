@@ -3,7 +3,7 @@ package backend
 import (
 	"strings"
 
-	"github.com/spaceclam/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/battery"
 )
 
 func DetectVendor() string {

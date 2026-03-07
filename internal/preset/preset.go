@@ -3,7 +3,7 @@ package preset
 import (
 	"fmt"
 
-	"github.com/spaceclam/batctl/internal/backend"
+	"github.com/Ooooze/batctl/internal/backend"
 )
 
 type Preset struct {
