@@ -1,5 +1,5 @@
 pkgname=batctl-tui
-pkgver=2026.3.5
+pkgver=2026.3.6
 pkgrel=1
 pkgdesc="TUI and CLI tool for managing battery charge thresholds on Linux laptops"
 arch=('x86_64' 'aarch64')
