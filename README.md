@@ -302,10 +302,10 @@ If batctl saved your battery some cycles, consider buying me a coffee in crypto:
 
 | Currency | Network | Address |
 |----------|---------|---------|
-| **BTC** | Bitcoin | `your-btc-address` |
-| **ETH** | Ethereum | `your-eth-address` |
-| **USDT** | TRC-20 | `your-trc20-address` |
-| **TON** | TON | `your-ton-address` |
+| **BTC** | Bitcoin | `bc1qflyxz75wkcyet89cttanyv7ws98lf8wjezdydq` |
+| **ETH** | Ethereum | `0xAfAA1CEdb10ECfC696C9984e857c813CB1871b4C` |
+| **USDT** | TRC-20 | `TSgwHUf6tiuJgFmaerb3TyTjggoP5cPecb` |
+| **TON** | TON | `UQA1SYTIdmH7iPNcUtbOtQXtCLPzTYeR8YxCdxksU8HMhkSe` |
 
 ## License
 
