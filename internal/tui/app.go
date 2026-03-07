@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"os"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -12,6 +13,14 @@ import (
 	"github.com/Ooooze/batctl/internal/persist"
 	"github.com/Ooooze/batctl/internal/preset"
 )
+
+type clearMessageMsg struct{}
+
+func clearMessageAfter(d time.Duration) tea.Cmd {
+	return tea.Tick(d, func(time.Time) tea.Msg {
+		return clearMessageMsg{}
+	})
+}
 
 type field int
 
@@ -132,6 +141,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		return m, nil
+	case clearMessageMsg:
+		m.message = ""
+		return m, nil
 	case tea.KeyMsg:
 		return m.handleKey(msg)
 	}
@@ -140,6 +152,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	key := msg.String()
+	var cmd tea.Cmd
 
 	switch key {
 	case "q", "ctrl+c":
@@ -160,33 +173,33 @@ func (m model) handleKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.adjustCurrent(5)
 
 	case "enter":
-		m.handleEnter()
+		cmd = m.handleEnter()
 
 	case "a":
-		m.applyAndSave()
+		cmd = m.applyAndSave()
 	case "r":
 		m.refreshAll()
-		m.setMessage("Refreshed", successStyle)
+		cmd = m.setMessage("Refreshed", successStyle)
 	}
 
-	return m, nil
+	return m, cmd
 }
 
-func (m *model) handleEnter() {
+func (m *model) handleEnter() tea.Cmd {
 	switch m.activeField {
 	case fieldPreset:
 		p := preset.Presets[m.presetIdx]
 		start, stop, err := preset.AdaptToBackend(p, m.backend)
 		if err != nil {
-			m.setMessage(fmt.Sprintf("Preset error: %v", err), errorStyle)
-		} else {
-			m.startVal = start
-			m.stopVal = stop
-			m.setMessage(fmt.Sprintf("Preset %q: %d%%–%d%% (press 'a' to apply)", p.Name, start, stop), successStyle)
+			return m.setMessage(fmt.Sprintf("Preset error: %v", err), errorStyle)
 		}
+		m.startVal = start
+		m.stopVal = stop
+		return m.setMessage(fmt.Sprintf("Preset %q: %d%%–%d%% (press 'a' to apply)", p.Name, start, stop), successStyle)
 	case fieldPersist:
-		m.togglePersist()
+		return m.togglePersist()
 	}
+	return nil
 }
 
 func (m *model) adjustCurrent(delta int) {
@@ -288,66 +301,60 @@ func (m *model) adjustValue(delta int) {
 	}
 }
 
-func (m *model) applyAndSave() {
+func (m *model) applyAndSave() tea.Cmd {
 	if len(m.batteries) == 0 {
-		return
+		return nil
 	}
 	bat := m.batteries[0]
 
 	if err := m.backend.SetThresholds(bat, m.startVal, m.stopVal); err != nil {
-		m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
-		return
+		return m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
 	}
 
 	caps := m.backend.Capabilities()
 	if caps.ChargeBehaviour && m.behaviourCur != "" {
 		if err := m.backend.SetChargeBehaviour(bat, m.behaviourCur); err != nil {
-			m.setMessage(fmt.Sprintf("Thresholds set, but behaviour error: %v", err), errorStyle)
-			return
+			return m.setMessage(fmt.Sprintf("Thresholds set, but behaviour error: %v", err), errorStyle)
 		}
 	}
 
 	cfg := persist.Config{Battery: bat, Start: m.startVal, Stop: m.stopVal}
 	if err := persist.SaveConfig(cfg); err != nil {
 		m.refreshBatInfo()
-		m.setMessage(fmt.Sprintf("Applied %d/%d (config save failed: %v)", m.startVal, m.stopVal, err), errorStyle)
-		return
+		return m.setMessage(fmt.Sprintf("Applied %d/%d (config save failed: %v)", m.startVal, m.stopVal, errorStyle), errorStyle)
 	}
 
 	m.refreshBatInfo()
 	m.refreshPersistStatus()
-	m.setMessage(fmt.Sprintf("Applied & saved: %d%%–%d%%", m.startVal, m.stopVal), successStyle)
+	return m.setMessage(fmt.Sprintf("Applied & saved: %d%%–%d%%", m.startVal, m.stopVal), successStyle)
 }
 
-func (m *model) togglePersist() {
+func (m *model) togglePersist() tea.Cmd {
 	if m.persistSvc || m.persistUdev {
 		if err := persist.RemoveService(); err != nil {
-			m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
-			return
+			return m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
 		}
 		if err := persist.RemoveUdevRule(); err != nil {
-			m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
-			return
+			return m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
 		}
 		m.refreshPersistStatus()
-		m.setMessage("Persistence disabled", dimStyle)
-	} else {
-		if err := persist.InstallService(); err != nil {
-			m.setMessage(fmt.Sprintf("Error: %v (try with sudo)", err), errorStyle)
-			return
-		}
-		if err := persist.InstallUdevRule(); err != nil {
-			m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
-			return
-		}
-		m.refreshPersistStatus()
-		m.setMessage("Persistence enabled (systemd + udev)", successStyle)
+		return m.setMessage("Persistence disabled", dimStyle)
 	}
+
+	if err := persist.InstallService(); err != nil {
+		return m.setMessage(fmt.Sprintf("Error: %v (try with sudo)", err), errorStyle)
+	}
+	if err := persist.InstallUdevRule(); err != nil {
+		return m.setMessage(fmt.Sprintf("Error: %v", err), errorStyle)
+	}
+	m.refreshPersistStatus()
+	return m.setMessage("Persistence enabled (systemd + udev)", successStyle)
 }
 
-func (m *model) setMessage(msg string, style lipgloss.Style) {
+func (m *model) setMessage(msg string, style lipgloss.Style) tea.Cmd {
 	m.message = msg
 	m.messageStyle = style
+	return clearMessageAfter(3 * time.Second)
 }
 
 func (m model) View() string {

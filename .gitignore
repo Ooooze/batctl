@@ -1,4 +1,4 @@
-./batctl
+/batctl
 .env
 .DS_Store
 .idea
