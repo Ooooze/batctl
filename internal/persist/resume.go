@@ -24,6 +24,7 @@ WantedBy=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibern
 `
 
 func InstallResumeService() error {
+	removeLegacyUdevRule()
 	if err := os.WriteFile(resumeServicePath, []byte(resumeServiceTemplate), 0644); err != nil {
 		return fmt.Errorf("writing resume service: %w", err)
 	}
@@ -34,11 +35,20 @@ func InstallResumeService() error {
 }
 
 func RemoveResumeService() error {
+	removeLegacyUdevRule()
 	_ = systemctl("disable", resumeServiceName)
 	if err := os.Remove(resumeServicePath); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("removing resume service: %w", err)
 	}
 	return systemctl("daemon-reload")
+}
+
+func removeLegacyUdevRule() {
+	legacyPath := "/etc/udev/rules.d/99-batctl-resume.rules"
+	if _, err := os.Stat(legacyPath); err == nil {
+		os.Remove(legacyPath)
+		exec.Command("udevadm", "control", "--reload-rules").Run()
+	}
 }
 
 func ResumeServiceEnabled() bool {
