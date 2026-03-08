@@ -250,6 +250,9 @@ func detectCmd() *cobra.Command {
 			b, err := backend.Detect()
 			if err != nil {
 				fmt.Printf("Backend: none detected (%v)\n", err)
+				if hint := backend.DetectHint(); hint != "" {
+					fmt.Printf("\n%s\n", hint)
+				}
 				return nil
 			}
 
