@@ -33,7 +33,7 @@ Tools like TLP are powerful but heavy and config-file-driven.
 - **One binary, zero config** — auto-detects your hardware and shows what's possible
 - **Interactive TUI** — see battery health, adjust thresholds with arrow keys, pick presets
 - **Scriptable CLI** — `batctl set --stop 80` for automation and dotfiles
-- **14+ vendor backends** — from ThinkPad to Apple Silicon, with a generic fallback
+- **15+ vendor backends** — from ThinkPad to Apple Silicon, with a generic fallback
 - **Persistence** — survives reboots and suspend/resume via systemd
 
 ## Installation
@@ -190,6 +190,7 @@ exposing standard `charge_control_{start,end}_threshold` files.
 
 | Vendor | Start | Stop | Behaviour | Kernel Driver |
 |--------|:-----:|:----:|:---------:|---------------|
+| **Acer** | — | 80 or 100 | — | `acer-wmi-battery` |
 | **Lenovo ThinkPad** | 0–99 | 1–100 | ✓ | `thinkpad_acpi` |
 | **ASUS** | — | 0–100¹ | — | `asus_wmi` |
 | **Dell** | 50–95 | 55–100 | — | `dell_laptop` |
@@ -255,7 +256,7 @@ No direct hardware access, no custom kernel modules required.
 batctl/
 ├── cmd/batctl/          → CLI entry point (cobra)
 ├── internal/
-│   ├── backend/         → 14 vendor backends + generic + auto-detection
+│   ├── backend/         → 15 vendor backends + generic + auto-detection
 │   ├── battery/         → sysfs read/write helpers, battery info
 │   ├── persist/         → systemd services, config file
 │   ├── preset/          → built-in presets with hardware adaptation
