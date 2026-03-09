@@ -82,6 +82,7 @@ func init() {
 	Register(&ToshibaBackend{})
 	Register(&TuxedoBackend{})
 	Register(&AppleBackend{})
+	Register(&SurfaceBackend{})
 	// Generic must be last — it's the fallback
 	Register(&GenericBackend{})
 }

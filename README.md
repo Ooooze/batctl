@@ -33,7 +33,7 @@ Tools like TLP are powerful but heavy and config-file-driven.
 - **One binary, zero config** — auto-detects your hardware and shows what's possible
 - **Interactive TUI** — see battery health, adjust thresholds with arrow keys, pick presets
 - **Scriptable CLI** — `batctl set --stop 80` for automation and dotfiles
-- **15+ vendor backends** — from ThinkPad to Apple Silicon, with a generic fallback
+- **16+ vendor backends** — from ThinkPad to Apple Silicon, with a generic fallback
 - **Persistence** — survives reboots and suspend/resume via systemd
 
 ## Installation
@@ -205,6 +205,7 @@ exposing standard `charge_control_{start,end}_threshold` files.
 | **Toshiba/Dynabook** | — | 80 or 100 | — | `toshiba_acpi` |
 | **Tuxedo (Clevo)** | discrete⁵ | discrete⁵ | — | `clevo_acpi` |
 | **Apple Silicon** | auto³ | 80 or 100 | — | `macsmc_power` |
+| **Microsoft Surface** | 0–99⁶ | 1–100 | — | `surface_battery` |
 | **Generic fallback** | 0–99 | 1–100 | ✓ | any sysfs |
 
 <sup>¹ Some ASUS models only accept 40, 60, or 80</sup><br>
@@ -212,6 +213,7 @@ exposing standard `charge_control_{start,end}_threshold` files.
 <sup>³ Start threshold is computed by hardware from stop value</sup><br>
 <sup>⁴ Start threshold requires EC firmware v3</sup><br>
 <sup>⁵ Tuxedo start: 40/50/60/70/80/95 — stop: 60/70/80/90/100</sup>
+<sup>⁶ Requires linux-surface kernel; start threshold availability varies by model</sup>
 
 ## Persistence
 
@@ -256,7 +258,7 @@ No direct hardware access, no custom kernel modules required.
 batctl/
 ├── cmd/batctl/          → CLI entry point (cobra)
 ├── internal/
-│   ├── backend/         → 15 vendor backends + generic + auto-detection
+│   ├── backend/         → 16 vendor backends + generic + auto-detection
 │   ├── battery/         → sysfs read/write helpers, battery info
 │   ├── persist/         → systemd services, config file
 │   ├── preset/          → built-in presets with hardware adaptation
