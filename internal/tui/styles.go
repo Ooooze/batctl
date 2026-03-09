@@ -56,4 +56,7 @@ var (
 	statusBarStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#888888")).
 			Padding(0, 1)
+
+	warningStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FFAA00"))
 )

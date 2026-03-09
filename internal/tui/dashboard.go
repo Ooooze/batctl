@@ -45,6 +45,14 @@ func renderDashboard(m model) string {
 
 	b.WriteString("\n")
 
+	if m.upowerInfo.Enabled {
+		b.WriteString("  " + warningStyle.Render(fmt.Sprintf(
+			"⚠  UPower charge limit active (start=%d%%, stop=%d%%)",
+			m.upowerInfo.StartThreshold, m.upowerInfo.EndThreshold)) + "\n")
+		b.WriteString("  " + dimStyle.Render(
+			"Disable \"Charge Limit\" in GNOME Settings → Power") + "\n\n")
+	}
+
 	// Thresholds
 	b.WriteString("  " + labelStyle.Render("Charge Thresholds") + "\n")
 	b.WriteString(renderThresholdLine("Start", m.startVal, m.activeField == fieldStart) + "\n")

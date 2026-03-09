@@ -10,6 +10,7 @@ import (
 
 	"github.com/Ooooze/batctl/internal/backend"
 	"github.com/Ooooze/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/conflict"
 	"github.com/Ooooze/batctl/internal/persist"
 	"github.com/Ooooze/batctl/internal/preset"
 )
@@ -54,6 +55,7 @@ type model struct {
 	persistSvc    bool
 	persistResume bool
 	persistCfg    *persist.Config
+	upowerInfo    conflict.UPowerInfo
 }
 
 func initialModel() (model, error) {
@@ -84,6 +86,13 @@ func (m *model) refreshAll() {
 	m.refreshThresholds()
 	m.refreshBatInfos()
 	m.refreshPersistStatus()
+	m.refreshUPowerStatus()
+}
+
+func (m *model) refreshUPowerStatus() {
+	if len(m.batteries) > 0 {
+		m.upowerInfo = conflict.CheckUPower(m.batteries[0])
+	}
 }
 
 func (m *model) refreshThresholds() {

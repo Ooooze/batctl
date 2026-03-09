@@ -9,6 +9,7 @@ import (
 
 	"github.com/Ooooze/batctl/internal/backend"
 	"github.com/Ooooze/batctl/internal/battery"
+	"github.com/Ooooze/batctl/internal/conflict"
 	"github.com/Ooooze/batctl/internal/persist"
 	"github.com/Ooooze/batctl/internal/preset"
 	"github.com/Ooooze/batctl/internal/tui"
@@ -89,6 +90,8 @@ func statusCmd() *cobra.Command {
 
 			fmt.Printf("\nPersistence:  boot=%v  resume=%v\n",
 				persist.ServiceEnabled(), persist.ResumeServiceEnabled())
+
+			printUPowerWarning(bats)
 
 			return nil
 		},
@@ -293,6 +296,8 @@ func detectCmd() *cobra.Command {
 			bats := battery.ListBatteries()
 			fmt.Printf("Batteries: %v\n", bats)
 
+			printUPowerWarning(bats)
+
 			return nil
 		},
 	}
@@ -303,4 +308,17 @@ func enabledStr(v bool) string {
 		return "enabled"
 	}
 	return "disabled"
+}
+
+func printUPowerWarning(bats []string) {
+	if len(bats) == 0 {
+		return
+	}
+	info := conflict.CheckUPower(bats[0])
+	if !info.Enabled {
+		return
+	}
+	fmt.Printf("\n⚠  Warning: UPower is managing charge thresholds (start=%d%%, stop=%d%%)\n", info.StartThreshold, info.EndThreshold)
+	fmt.Println("   batctl changes may be overridden by your desktop environment.")
+	fmt.Println("   To fix: disable \"Charge Limit\" in GNOME Settings → Power.")
 }
