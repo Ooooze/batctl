@@ -13,3 +13,4 @@
 .env.production
 .env.local
 .env.development.local
+/result
