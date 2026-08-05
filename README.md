@@ -277,6 +277,7 @@ batctl/
 ## Community Projects
 
 
+- **[batctl-plasma](https://github.com/BorisLord/batctl-plasma)** — Native Plasma 6 GUI for batctl
 - **[threshpad](https://github.com/looselyhuman/threshpad)** — GNOME Shell extension for batctl
 
 ## Contributing
