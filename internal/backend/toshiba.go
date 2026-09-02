@@ -47,6 +47,9 @@ func (b *ToshibaBackend) SetThresholds(bat string, start, stop int) error {
 	if err := b.ValidateThresholds(start, stop); err != nil {
 		return err
 	}
+	if !battery.SysfsExists(battery.BatPath(bat, "charge_control_end_threshold")) {
+		return ErrNotChargeable
+	}
 	return battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_end_threshold"), stop)
 }
 

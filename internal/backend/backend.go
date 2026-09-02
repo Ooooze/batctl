@@ -1,6 +1,9 @@
 package backend
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type Capabilities struct {
 	StartThreshold    bool
@@ -12,6 +15,12 @@ type Capabilities struct {
 	StartAutoComputed bool   // MSI: start = stop - 10 automatically
 	StartStopGap      int    // if non-zero, hardware enforces start = stop - gap (Dell: 5)
 }
+
+// ErrNotChargeable is returned by SetThresholds when the target battery does
+// not expose any charge control attributes (e.g. HID++ peripheral batteries,
+// which appear under /sys/class/power_supply/ with type=Battery but have no
+// charge_control_* files).
+var ErrNotChargeable = errors.New("battery does not expose charge control attributes")
 
 type Backend interface {
 	Name() string

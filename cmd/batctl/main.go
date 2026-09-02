@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -134,11 +135,19 @@ func setCmd() *cobra.Command {
 				return fmt.Errorf("invalid thresholds: %w", err)
 			}
 
+			applied := 0
 			for _, bat := range bats {
 				if err := b.SetThresholds(bat, startVal, stopVal); err != nil {
+					if errors.Is(err, backend.ErrNotChargeable) {
+						continue
+					}
 					return fmt.Errorf("setting thresholds on %s: %w", bat, err)
 				}
+				applied++
 				fmt.Printf("Thresholds set: start=%d%% stop=%d%% on %s\n", startVal, stopVal, bat)
+			}
+			if applied == 0 {
+				return fmt.Errorf("no batteries supporting charge control found")
 			}
 			return nil
 		},
@@ -173,11 +182,19 @@ func applyCmd() *cobra.Command {
 				bats = []string{cfg.Battery}
 			}
 
+			applied := 0
 			for _, bat := range bats {
 				if err := b.SetThresholds(bat, cfg.Start, cfg.Stop); err != nil {
+					if errors.Is(err, backend.ErrNotChargeable) && cfg.Battery == "all" {
+						continue
+					}
 					return fmt.Errorf("applying thresholds on %s: %w", bat, err)
 				}
+				applied++
 				fmt.Printf("Applied: start=%d%% stop=%d%% on %s\n", cfg.Start, cfg.Stop, bat)
+			}
+			if applied == 0 {
+				return fmt.Errorf("no batteries supporting charge control found")
 			}
 			return nil
 		},

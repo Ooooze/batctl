@@ -61,13 +61,18 @@ func (b *SurfaceBackend) SetThresholds(bat string, start, stop int) error {
 	if err := b.ValidateThresholds(start, stop); err != nil {
 		return err
 	}
-	caps := b.Capabilities()
-	if caps.StartThreshold {
+	if !battery.SupportsChargeControl(bat) {
+		return ErrNotChargeable
+	}
+	if battery.SysfsExists(battery.BatPath(bat, "charge_control_start_threshold")) {
 		if err := battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_start_threshold"), start); err != nil {
 			return err
 		}
 	}
-	return battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_end_threshold"), stop)
+	if battery.SysfsExists(battery.BatPath(bat, "charge_control_end_threshold")) {
+		return battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_end_threshold"), stop)
+	}
+	return nil
 }
 
 func (b *SurfaceBackend) GetChargeBehaviour(bat string) (current string, available []string, err error) {
