@@ -69,6 +69,9 @@ func (b *LGBackend) SetThresholds(bat string, start, stop int) error {
 	if b.legacy {
 		return battery.SysfsWriteInt(lgBatteryCareLimitPath, stop)
 	}
+	if !battery.SysfsExists(battery.BatPath(bat, "charge_control_end_threshold")) {
+		return ErrNotChargeable
+	}
 	return battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_end_threshold"), stop)
 }
 

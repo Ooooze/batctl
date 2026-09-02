@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -336,19 +337,28 @@ func (m *model) applyAndSave() tea.Cmd {
 
 	caps := m.backend.Capabilities()
 
+	var applied []string
 	for _, bat := range m.batteries {
 		if err := m.backend.SetThresholds(bat, m.startVal, m.stopVal); err != nil {
+			if errors.Is(err, backend.ErrNotChargeable) {
+				continue
+			}
 			return m.setMessage(fmt.Sprintf("Error on %s: %v", bat, err), errorStyle)
 		}
-		if caps.ChargeBehaviour && m.behaviourCur != "" {
+		applied = append(applied, bat)
+		if caps.ChargeBehaviour && m.behaviourCur != "" &&
+			battery.SysfsExists(battery.BatPath(bat, "charge_behaviour")) {
 			if err := m.backend.SetChargeBehaviour(bat, m.behaviourCur); err != nil {
 				return m.setMessage(fmt.Sprintf("Thresholds set, but behaviour error on %s: %v", bat, err), errorStyle)
 			}
 		}
 	}
+	if len(applied) == 0 {
+		return m.setMessage("No batteries support charge control", errorStyle)
+	}
 
-	batName := m.batteries[0]
-	if len(m.batteries) > 1 {
+	batName := applied[0]
+	if len(applied) > 1 {
 		batName = "all"
 	}
 	cfg := persist.Config{Battery: batName, Start: m.startVal, Stop: m.stopVal}

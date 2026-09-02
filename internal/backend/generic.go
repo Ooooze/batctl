@@ -69,13 +69,15 @@ func (b *GenericBackend) SetThresholds(bat string, start, stop int) error {
 	if err := b.ValidateThresholds(start, stop); err != nil {
 		return err
 	}
-	caps := b.Capabilities()
-	if caps.StartThreshold {
+	if !battery.SupportsChargeControl(bat) {
+		return ErrNotChargeable
+	}
+	if battery.SysfsExists(battery.BatPath(bat, "charge_control_start_threshold")) {
 		if err := battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_start_threshold"), start); err != nil {
 			return err
 		}
 	}
-	if caps.StopThreshold {
+	if battery.SysfsExists(battery.BatPath(bat, "charge_control_end_threshold")) {
 		if err := battery.SysfsWriteInt(battery.BatPath(bat, "charge_control_end_threshold"), stop); err != nil {
 			return err
 		}

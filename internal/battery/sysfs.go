@@ -73,3 +73,10 @@ func ListBatteries() []string {
 	}
 	return bats
 }
+
+// SupportsChargeControl reports whether a power_supply exposes the standard
+// charge_control_* threshold attributes.
+func SupportsChargeControl(bat string) bool {
+	return SysfsExists(BatPath(bat, "charge_control_start_threshold")) ||
+		SysfsExists(BatPath(bat, "charge_control_end_threshold"))
+}
